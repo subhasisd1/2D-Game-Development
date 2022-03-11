@@ -15,6 +15,14 @@ public class PlayerController : MonoBehaviour
     public GameObject gameWonPanel;
 	public GameObject gameLostPanel;
 
+	public GameObject gameMainMenu;
+    public GameObject gameLevel;
+
+    public GameObject scrorePanel;
+    public GameObject gameLevel1;
+
+
+
     public float jump;
     public bool isGrounded;
     public float speed;
@@ -24,6 +32,7 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
+        // gameMainMenu.SetActive(true);
         rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
         boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
@@ -33,20 +42,25 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log("Game Started");
         speed = 5f;
-        jump = 23f;
+        jump = 25f;
          coliderSize = boxCollider2D.size;
         offsetSize = boxCollider2D.offset;
     }
 
     void Update()
     {
+
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        playerMovement(horizontal, vertical);
-        MoveCharecter(horizontal, vertical);
-        PLayerCrouch();
-        PlayerJump();
+        if (animator.enabled)
+        {
+            playerMovement(horizontal, vertical);
+            MoveCharecter(horizontal, vertical);
+            PLayerCrouch();
+            PlayerJump();
+        }
+    
     }
 
 
@@ -70,20 +84,6 @@ public class PlayerController : MonoBehaviour
         }
        
         transform.localScale = scale;
-
-        // Jump
-        // if(isGrounded && vertical > 0)
-       // if(vertical > 0)
-
-        {
-       //     rigidbody2D.AddForce(new Vector2(0f, jump), ForceMode2D.Impulse );
-      //      animator.SetBool("Jump", true);
-
-        }
-       // else
-        {
-       //     animator.SetBool("Jump", false);
-        }
 
     }
 
@@ -128,7 +128,6 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D col)
      {
-		// Debug.Log ("I am at : "+ col.gameObject.name);
         
         if(col.gameObject.name == "Door")
         {
@@ -139,18 +138,16 @@ public class PlayerController : MonoBehaviour
          if(col.gameObject.name == "GroundTileMap")
         {
             isGrounded = true;
-           //  Debug.Log("Is Grounded :" + isGrounded);
 
         }
-
-
-
      }
 
     public void RestartGame()
 	{
 		gameWonPanel.SetActive (false);
-		SceneManager.LoadScene (6);
+		gameLostPanel.SetActive (false);
+
+		SceneManager.LoadScene (0);
 	}
 
     void OnCollisionExit2D(Collision2D collision)
@@ -160,9 +157,41 @@ public class PlayerController : MonoBehaviour
         {
         isGrounded = false;
         }
-        // Debug.Log("Is Grounded :" + isGrounded);
+    }
+
+    public void KillPlayer()
+    {
+         Debug.Log("PLayer Killed by Enemy");
+		gameLostPanel.SetActive (true);
+        animator.enabled = false;
 
     }
 
+    public void StartGame()
+    {
+        gameMainMenu.SetActive(false);
+        gameLevel1.SetActive(true);
+        scrorePanel.SetActive(true);
+    }
 
+    public void showLevels()
+    {
+        gameLevel.SetActive(true);
+        scrorePanel.SetActive(false);
+        gameMainMenu.SetActive(false);
+    }
+
+    public void LoadGameLevel1()
+    {
+        gameLevel1.SetActive(true);
+        gameMainMenu.SetActive(false);
+        gameLevel.SetActive(false);
+    }
+
+    public void ShowMainMenu()
+    {
+        gameMainMenu.SetActive(true);
+        gameLevel.SetActive(false);
+
+    }
 }
