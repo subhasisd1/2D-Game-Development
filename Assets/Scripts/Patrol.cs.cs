@@ -13,16 +13,12 @@ public class Patrol : MonoBehaviour {
 	// Use this for initialization
 	void Start()
 	{
-
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-
 		transform.Translate(Vector2.right * speed * Time.deltaTime);
-
-
 	}
 
 
@@ -31,10 +27,7 @@ public class Patrol : MonoBehaviour {
 		transform.eulerAngles = new Vector3(0, -180, 0);
 		if (other.tag == "wall")
 		{
-
 			Debug.Log("Touched Wall!!!");
-
-
 		}
 		else
 		{

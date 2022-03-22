@@ -5,11 +5,9 @@ using UnityEngine.UI;
     
 public class HealthController : MonoBehaviour
 {
-
     public int playerHealth;
     public Image[] hearts;
 
-    
     // Start is called before the first frame update
     void Start()
     {

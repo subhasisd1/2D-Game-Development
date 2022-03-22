@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GameMenuController : MonoBehaviour
 {
-
     public GameObject gameMainMenu;
     public GameObject gameLevels;
     private int currentScene;

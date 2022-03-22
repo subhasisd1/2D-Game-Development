@@ -31,12 +31,8 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        // gameMainMenu.SetActive(true);
-       
-       // Debug.Log("Scene Name : " + SceneManager.GetActiveScene().name);
+ 
         currentScene = SceneManager.GetActiveScene().buildIndex;
-      //  Debug.Log("Scene Index : " + currentScene);
-
         rigidbody2 = gameObject.GetComponent<Rigidbody2D>();
         boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
@@ -128,8 +124,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-   
-   
     public void KillPlayer()
     {
         isDead = true;
@@ -138,7 +132,6 @@ public class PlayerController : MonoBehaviour
     
     public void HitByEnemy()
     {
-
     }
 
     IEnumerator PlayDeathCoroutine()

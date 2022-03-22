@@ -11,7 +11,6 @@ public class MovingPlatformController : MonoBehaviour
     public bool isPlayerInRange;
     public Tilemap tilemap;
 
-
     [HideInInspector]
     public bool mustTurn;
 
@@ -50,7 +49,6 @@ public class MovingPlatformController : MonoBehaviour
         walkSpeed *= -1;
         mustPatrol = true;
     }
-
 
     private void OnCollisionEnter2D(Collision2D col)
     {

@@ -140,13 +140,10 @@ public class EnemyController : MonoBehaviour
          if(disToPlayer <= 2f)
                 {
                     animator.SetBool("run", true);
-
                 }else
                 {
                     animator.SetBool("run", false);
-
                 }
-                
     }
 
 }

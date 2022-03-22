@@ -31,7 +31,6 @@ public class ScoreController : MonoBehaviour
 
         RefreshUI();
     }
-
     private void RefreshUI()
     {
         scroreText.text = "Score: " + score;
