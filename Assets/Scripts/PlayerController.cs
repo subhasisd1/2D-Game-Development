@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,32 +9,35 @@ public class PlayerController : MonoBehaviour
     public ScoreController scoreController;
 
     public Animator animator;
-    public Rigidbody2D rigidbody2D;
+    public Rigidbody2D rigidbody2;
     public SpriteRenderer sprite;
     public BoxCollider2D boxCollider2D;
 
-    public GameObject gameWonPanel;
-	public GameObject gameLostPanel;
-
 	public GameObject gameMainMenu;
-    public GameObject gameLevel;
-
     public GameObject scrorePanel;
-    public GameObject gameLevel1;
-
-
 
     public float jump;
-    public bool isGrounded;
-    public float speed;
-    public Vector3 scale;
+    private bool isGrounded;
+    private bool isPlayerPlatform;
+    private float speed;
+    public Vector3 playerscale;
     public  Vector2 coliderSize, offsetSize;
+    private bool isDead;
+
+    private int currentScene;
+
+    public GameObject platformPos;
 
 
     void Awake()
     {
         // gameMainMenu.SetActive(true);
-        rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
+       
+       // Debug.Log("Scene Name : " + SceneManager.GetActiveScene().name);
+        currentScene = SceneManager.GetActiveScene().buildIndex;
+      //  Debug.Log("Scene Index : " + currentScene);
+
+        rigidbody2 = gameObject.GetComponent<Rigidbody2D>();
         boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
     }
@@ -49,52 +53,52 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        if (animator.enabled)
+        if (animator.enabled && !isDead)
         {
             playerMovement(horizontal, vertical);
             MoveCharecter(horizontal, vertical);
             PLayerCrouch();
             PlayerJump();
+            onExitButtonClick();
         }
-    
-    }
 
+        if (isPlayerPlatform)
+        {
+       
+           // transform.position = movingPlatform.transform.position;
+        }
+    }
 
     public void PickUpKey()
     {
         Debug.Log("Player Picked up the key");
         scoreController.IncreaseScore(10);
-    
     }
     private void playerMovement(float horizontal, float vertical)
     {
 
          animator.SetFloat("speed", Mathf.Abs(horizontal));
-         scale = transform.localScale;
+        playerscale = transform.localScale;
 
         if(horizontal < 0) {
-            scale.x = -1f * Mathf.Abs(scale.x);
+            playerscale.x = -1f * Mathf.Abs(playerscale.x);
         }
         else if(horizontal>0) {
-            scale.x = Mathf.Abs(scale.x);
+            playerscale.x = Mathf.Abs(playerscale.x);
         }
        
-        transform.localScale = scale;
-
+        transform.localScale = playerscale;
     }
 
       private void MoveCharecter(float horizontal, float vertical)
     {
-
         Vector3 position = transform.position;
         position.x = position.x + horizontal * speed * Time.deltaTime;
         transform.position = position;
     }
-
     private void PLayerCrouch()
     {
         if (Input.GetKey(KeyCode.LeftControl))
@@ -116,82 +120,93 @@ public class PlayerController : MonoBehaviour
     {
          if (Input.GetKeyDown(KeyCode.Space))
         {
-            rigidbody2D.AddForce(new Vector2(0f, jump), ForceMode2D.Impulse );
+            rigidbody2.AddForce(new Vector2(0f, jump), ForceMode2D.Impulse );
             animator.SetBool("Jump", true);   
         }else
         {
             animator.SetBool("Jump", false);
-
         }
+    }
 
+   
+   
+    public void KillPlayer()
+    {
+        isDead = true;
+         StartCoroutine(PlayDeathCoroutine());
+    }
+    
+    public void HitByEnemy()
+    {
+
+    }
+
+    IEnumerator PlayDeathCoroutine()
+    {
+        // animator.Play("PlayerDeath");
+        animator.SetBool("dead", true);
+         yield return new WaitForSeconds(0.60f);
+        animator.SetBool("dead", false);
+       yield return new WaitForSeconds(1f);
+
+         gameMainMenu.SetActive(true);
+    }
+
+    private void onExitButtonClick()
+    {
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("Escape is Clicked");
+        }
     }
 
     void OnCollisionEnter2D(Collision2D col)
-     {
-        
-        if(col.gameObject.name == "Door")
+    {
+
+        if (col.gameObject.name == "Door")
         {
-            gameWonPanel.SetActive (true);
-            animator.enabled = false;
+          SceneManager.LoadScene(currentScene + 1);
         }
 
-         if(col.gameObject.name == "GroundTileMap")
+        if (col.gameObject.name == "GroundTileMap")
         {
             isGrounded = true;
-
         }
-     }
 
-    public void RestartGame()
-	{
-		gameWonPanel.SetActive (false);
-		gameLostPanel.SetActive (false);
+        if (col.gameObject.name == "DeathGround")
+        {
+            SceneManager.LoadScene(currentScene);
+        }
 
-		SceneManager.LoadScene (0);
-	}
+        if (col.gameObject.name == "MovingPlatfotm")
+        {
+            isPlayerPlatform = true;
+           // platformPos = col.gameObject.GetComponent<MovingPlatformController>().transform.position;
+        }
+    }
 
     void OnCollisionExit2D(Collision2D collision)
     {
-  
-     if(collision.gameObject.name == "GroundTileMap")
+
+        if (collision.gameObject.name == "GroundTileMap")
         {
-        isGrounded = false;
+            isGrounded = false;
+        }
+
+        if (collision.gameObject.name == "MovingPlatfotm")
+        {
+            isPlayerPlatform = false;
         }
     }
 
-    public void KillPlayer()
+    public void RestartGame()
     {
-         Debug.Log("PLayer Killed by Enemy");
-		gameLostPanel.SetActive (true);
-        animator.enabled = false;
-
+        SceneManager.LoadScene(currentScene);
     }
 
-    public void StartGame()
+    public void GotoMainMenu()
     {
-        gameMainMenu.SetActive(false);
-        gameLevel1.SetActive(true);
-        scrorePanel.SetActive(true);
-    }
-
-    public void showLevels()
-    {
-        gameLevel.SetActive(true);
-        scrorePanel.SetActive(false);
-        gameMainMenu.SetActive(false);
-    }
-
-    public void LoadGameLevel1()
-    {
-        gameLevel1.SetActive(true);
-        gameMainMenu.SetActive(false);
-        gameLevel.SetActive(false);
-    }
-
-    public void ShowMainMenu()
-    {
-        gameMainMenu.SetActive(true);
-        gameLevel.SetActive(false);
-
+        SceneManager.LoadScene(0);
     }
 }

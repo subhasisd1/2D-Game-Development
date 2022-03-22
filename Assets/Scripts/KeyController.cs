@@ -8,9 +8,13 @@ public class KeyController : MonoBehaviour
     {
             if (col.gameObject.GetComponent<PlayerController>() != null)
         {
+            Debug.Log("Collision Key");
             PlayerController playerController = col.gameObject.GetComponent<PlayerController>();
-            playerController.PickUpKey();
+
             Destroy(gameObject);
+
+            playerController.PickUpKey();
+           // Destroy(gameObject);
         }
 
     }

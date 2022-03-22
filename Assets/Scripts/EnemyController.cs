@@ -7,16 +7,19 @@ public class EnemyController : MonoBehaviour
     public float walkSpeed, range;
     private float disToPlayer;
 
-    // [HideInInspector]
     public bool mustPatrol;
+    public bool isPlayerInRange;
+
+
+    [HideInInspector]
     public bool mustTurn;
-    private bool enemyRun;
+
     public Rigidbody2D rb;
     public Transform groudChkedPos;
     public LayerMask groundLayer;   
-    
     public Animator animator;
-    public Collider2D bodyColider;
+
+
     public Transform player;
     public HealthController health;
 
@@ -24,36 +27,38 @@ public class EnemyController : MonoBehaviour
     {
         mustPatrol = true;
         animator.SetBool("walk", true);
-        enemyRun = false;
 
     }
 
     void Update()
     {
-      
+        disToPlayer = Vector2.Distance(transform.position, player.position);
+
         if (mustPatrol)
         {
            Patrol();
         }
 
-        disToPlayer = Vector2.Distance(transform.position, player.position);
-
         if(disToPlayer <= range)
         {
              animator.SetBool("run", true);
-            enemyRun = true;
-
-            if(player.position.x > transform.position.x && transform.localScale.x < 0
+            mustPatrol = true;
+            // walkSpeed = 100f;
+            isPlayerInRange = true;
+            if (player.position.x > transform.position.x && transform.localScale.x < 0
                 || player.position.x < transform.position.x && transform.localScale.x > 0 )
             {
+
                 Flip();
             }
         }
         else
         {
              animator.SetBool("run", false);
-            enemyRun = false;
+            mustPatrol = true;
+            isPlayerInRange = false;
 
+            // walkSpeed = 50f;
         }
     }
 
@@ -61,19 +66,28 @@ public class EnemyController : MonoBehaviour
     {
         if (mustPatrol)
         {
-            mustTurn = !Physics2D.OverlapCircle(groudChkedPos.position, 0.1f, groundLayer);
+            RaycastHit2D groundInfo = Physics2D.Raycast(groudChkedPos.position, Vector2.down, 0.1f);
 
+            if (groundInfo.collider == false)
+            {            
+                Flip();
+            }
         }
     }
 
     private void Patrol()
     {
-     //   if (mustTurn || bodyColider.IsTouchingLayers(groundLayer))
+        //if (mustTurn || bodyColider.IsTouchingLayers(groundLayer))
+
+
+
         if (mustTurn)
         {
             Flip();
         }
-        rb.velocity = new Vector2(walkSpeed * Time.fixedDeltaTime, rb.velocity.y);
+    
+        transform.Translate(Vector2.right * walkSpeed * Time.deltaTime);
+
     }
 
     void Flip()
@@ -85,30 +99,33 @@ public class EnemyController : MonoBehaviour
     }
 
 
-     private void OnCollisionEnter2D(Collision2D col)
+    private void OnCollisionEnter2D(Collision2D col)
     {
-            if (col.gameObject.GetComponent<PlayerController>() != null)
+        if (col.gameObject.GetComponent<PlayerController>() != null)
         {
             PlayerController playerController = col.gameObject.GetComponent<PlayerController>();
 
-             health.playerHealth -= 1;
-            if(health.playerHealth == 0)
+            health.playerHealth -= 1;
+            if (health.playerHealth == 0)
             {
-                 playerController.KillPlayer();
-            }else
+                playerController.KillPlayer();
+                health.UpdateHealth(health.playerHealth);
+            }
+            else
             {
                 health.UpdateHealth(health.playerHealth);
+                playerController.HitByEnemy();
             }
         }
 
-            if(col.gameObject.tag == "GroundTileMap")
+        if (col.gameObject.tag == "GroundTileMap")
         {
             rb.gravityScale = 0f;
+            Patrol();
         }
-
     }
 
-      void OnCollisionExit2D(Collision2D collision)
+    void OnCollisionExit2D(Collision2D collision)
     {
   
      if(collision.gameObject.name == "GroundTileMap")
