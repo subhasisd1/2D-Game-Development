@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
 	public GameObject gameMainMenu;
     public GameObject scrorePanel;
 
+    public GameObject gameWon;
+
     public float jump;
     private bool isGrounded;
     private bool isPlayerPlatform;
@@ -36,6 +38,8 @@ public class PlayerController : MonoBehaviour
         rigidbody2 = gameObject.GetComponent<Rigidbody2D>();
         boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
+        gameWon.SetActive(false);
+
     }
     // Start is called before the first frame update
     void Start()
@@ -127,22 +131,20 @@ public class PlayerController : MonoBehaviour
     public void KillPlayer()
     {
         isDead = true;
-         StartCoroutine(PlayDeathCoroutine());
+        animator.SetTrigger("isDead");
+
+        StartCoroutine(PlayDeathCoroutine());
     }
     
     public void HitByEnemy()
     {
+
     }
 
     IEnumerator PlayDeathCoroutine()
-    {
-        // animator.Play("PlayerDeath");
-        animator.SetBool("dead", true);
-         yield return new WaitForSeconds(0.60f);
-        animator.SetBool("dead", false);
+    {      
        yield return new WaitForSeconds(1f);
-
-         gameMainMenu.SetActive(true);
+       gameMainMenu.SetActive(true);
     }
 
     private void onExitButtonClick()
@@ -156,10 +158,10 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D col)
     {
-
         if (col.gameObject.name == "Door")
         {
-          SceneManager.LoadScene(currentScene + 1);
+            gameWon.SetActive(true);
+
         }
 
         if (col.gameObject.name == "GroundTileMap")
@@ -169,7 +171,7 @@ public class PlayerController : MonoBehaviour
 
         if (col.gameObject.name == "DeathGround")
         {
-            SceneManager.LoadScene(currentScene);
+            KillPlayer();
         }
 
         if (col.gameObject.name == "MovingPlatfotm")
@@ -201,5 +203,10 @@ public class PlayerController : MonoBehaviour
     public void GotoMainMenu()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void NextLevel()
+    {
+        SceneManager.LoadScene(currentScene + 1);
     }
 }
