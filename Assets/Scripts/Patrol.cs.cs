@@ -7,13 +7,7 @@ public class Patrol : MonoBehaviour {
 	public float speed;
 	public float distance;
 	// public Rigidbody2D rigidbody2D;
-	private bool movingRight = true;
 	//public Transform groundDetection;
-
-	// Use this for initialization
-	void Start()
-	{
-	}
 
 	// Update is called once per frame
 	void Update()

@@ -4,28 +4,25 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    public float walkSpeed, range;
+    public float walkSpeed, range, timeBTWShots, shootSpeed;
     private float disToPlayer;
-
-    public bool mustPatrol;
+    private bool mustPatrol, cantShoot;
     public bool isPlayerInRange;
-
-
     [HideInInspector]
     public bool mustTurn;
-
     public Rigidbody2D rb;
     public Transform groudChkedPos;
     public LayerMask groundLayer;   
     public Animator animator;
-
-
-    public Transform player;
+    public Transform player, shootPos;
     public HealthController health;
+
+    public GameObject bullet;
 
     void Start()
     {
         mustPatrol = true;
+        cantShoot = true;
         animator.SetBool("walk", true);
 
     }
@@ -43,22 +40,25 @@ public class EnemyController : MonoBehaviour
         {
              animator.SetBool("run", true);
             mustPatrol = true;
+
             // walkSpeed = 100f;
             isPlayerInRange = true;
             if (player.position.x > transform.position.x && transform.localScale.x < 0
                 || player.position.x < transform.position.x && transform.localScale.x > 0 )
             {
-
                 Flip();
             }
+
+            mustPatrol = false;
+            rb.velocity = Vector2.zero;
+            if (cantShoot)
+                StartCoroutine(Shoot());
         }
         else
         {
              animator.SetBool("run", false);
             mustPatrol = true;
             isPlayerInRange = false;
-
-            // walkSpeed = 50f;
         }
     }
 
@@ -78,14 +78,10 @@ public class EnemyController : MonoBehaviour
     private void Patrol()
     {
         //if (mustTurn || bodyColider.IsTouchingLayers(groundLayer))
-
-
-
         if (mustTurn)
         {
             Flip();
         }
-    
         transform.Translate(Vector2.right * walkSpeed * Time.deltaTime);
 
     }
@@ -98,13 +94,11 @@ public class EnemyController : MonoBehaviour
         mustPatrol = true;
     }
 
-
     private void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.GetComponent<PlayerController>() != null)
         {
             PlayerController playerController = col.gameObject.GetComponent<PlayerController>();
-
             health.playerHealth -= 1;
             if (health.playerHealth == 0)
             {
@@ -134,16 +128,18 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-
-    private void RunToPLayer()
+    IEnumerator Shoot()
     {
-         if(disToPlayer <= 2f)
-                {
-                    animator.SetBool("run", true);
-                }else
-                {
-                    animator.SetBool("run", false);
-                }
-    }
+        cantShoot = false;
+        yield return new WaitForSeconds(timeBTWShots);
+        GameObject newBullet = Instantiate(bullet, shootPos.position, Quaternion.identity);
 
+        newBullet.GetComponent<Rigidbody2D>().velocity = new Vector2(transform.localScale.x * shootSpeed, transform.localScale.y);
+
+
+        Debug.Log(transform.localScale.x);
+
+        cantShoot = true;
+
+    }
 }

@@ -39,6 +39,12 @@ public class MovingPlatformController : MonoBehaviour
 
     private void Patrol()
     {
+        if (gameObject.name.Equals("MovingUpPlatform"))
+        {
+            transform.Translate(Vector2.up * walkSpeed * Time.deltaTime);
+
+        }
+        else
         transform.Translate(Vector2.right * walkSpeed * Time.deltaTime);
     }
 
@@ -52,9 +58,10 @@ public class MovingPlatformController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D col)
     {
+        Debug.Log(col.gameObject.name);
         if (col.gameObject.name == "GroundTileMap")
         {
-            Debug.Log("Touched " + col.gameObject.name + " here");
+           // Debug.Log("Touched " + col.gameObject.name + " here");
             Flip();
         }
     }

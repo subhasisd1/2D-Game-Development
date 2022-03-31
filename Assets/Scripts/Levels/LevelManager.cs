@@ -62,7 +62,7 @@ public class LevelManager : MonoBehaviour
         {
             SetLevelStatus(Levels[nextSceneIndex], LevelStatus.UnLocked);
         }
-
-
     }
+
+    
 }

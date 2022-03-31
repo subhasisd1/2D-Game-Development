@@ -1,9 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+//[Serializable]
 public class PlayerController : MonoBehaviour
 {
     public ScoreController scoreController;
@@ -12,24 +12,23 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rigidbody2;
     public SpriteRenderer sprite;
     public BoxCollider2D boxCollider2D;
-
 	public GameObject gameMainMenu;
     public GameObject scrorePanel;
-
     public GameObject gameWon;
-
     public float jump;
-    private bool isGrounded;
+    [SerializeField]
+    public bool isPGrounded;
+
     private bool isPlayerPlatform;
     private float speed;
     public Vector3 playerscale;
     public  Vector2 coliderSize, offsetSize;
     private bool isDead;
-
     private int currentScene;
-
     public GameObject platformPos;
 
+    [SerializeField]
+    public float horizontal;
 
     void Awake()
     {
@@ -53,10 +52,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
+        horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        if (animator.enabled && !isDead)
+        if (!isDead)
         {
             playerMovement(horizontal, vertical);
             MoveCharecter(horizontal, vertical);
@@ -74,23 +73,24 @@ public class PlayerController : MonoBehaviour
 
     public void PickUpKey()
     {
-        Debug.Log("Player Picked up the key");
         scoreController.IncreaseScore(10);
     }
     private void playerMovement(float horizontal, float vertical)
     {
 
-         animator.SetFloat("speed", Mathf.Abs(horizontal));
-        playerscale = transform.localScale;
+            animator.SetFloat("speed", Mathf.Abs(horizontal));
+            playerscale = transform.localScale;
 
-        if(horizontal < 0) {
-            playerscale.x = -1f * Mathf.Abs(playerscale.x);
-        }
-        else if(horizontal>0) {
-            playerscale.x = Mathf.Abs(playerscale.x);
-        }
-       
-        transform.localScale = playerscale;
+            if (horizontal < 0)
+            {
+                playerscale.x = -1f * Mathf.Abs(playerscale.x);
+            }
+            else if (horizontal > 0)
+            {
+                playerscale.x = Mathf.Abs(playerscale.x);
+            }
+
+            transform.localScale = playerscale;     
     }
 
       private void MoveCharecter(float horizontal, float vertical)
@@ -118,10 +118,12 @@ public class PlayerController : MonoBehaviour
 
     private void PlayerJump()
     {
-         if (Input.GetKeyDown(KeyCode.Space))
+         if (Input.GetKeyDown(KeyCode.Space) && isPGrounded)
         {
-            rigidbody2.AddForce(new Vector2(0f, jump), ForceMode2D.Impulse );
-            animator.SetBool("Jump", true);   
+                rigidbody2.AddForce(new Vector2(0f, jump), ForceMode2D.Impulse);
+                animator.SetBool("Jump", true);
+            
+             
         }else
         {
             animator.SetBool("Jump", false);
@@ -158,15 +160,19 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D col)
     {
+        Debug.Log(col.gameObject.name);
         if (col.gameObject.name == "Door")
         {
             gameWon.SetActive(true);
 
         }
 
-        if (col.gameObject.name == "GroundTileMap")
+        if (col.gameObject.name == "GroundTileMap" ||
+            col.gameObject.name == "MovingPlatform")
         {
-            isGrounded = true;
+            isPGrounded = true;
+            FindObjectOfType<PlayerAudioController>().Play(SoundType.PlayerJumpLand);
+
         }
 
         if (col.gameObject.name == "DeathGround")
@@ -174,7 +180,7 @@ public class PlayerController : MonoBehaviour
             KillPlayer();
         }
 
-        if (col.gameObject.name == "MovingPlatfotm")
+        if (col.gameObject.name == "MovingPlatform")
         {
             isPlayerPlatform = true;
            // platformPos = col.gameObject.GetComponent<MovingPlatformController>().transform.position;
@@ -184,12 +190,15 @@ public class PlayerController : MonoBehaviour
     void OnCollisionExit2D(Collision2D collision)
     {
 
-        if (collision.gameObject.name == "GroundTileMap")
+        if (collision.gameObject.name == "GroundTileMap" ||
+            collision.gameObject.name == "MovingPlatform")
         {
-            isGrounded = false;
+            isPGrounded = false;
+           FindObjectOfType<PlayerAudioController>().Play(SoundType.PlayerJump);
+
         }
 
-        if (collision.gameObject.name == "MovingPlatfotm")
+        if (collision.gameObject.name == "MovingPlatform")
         {
             isPlayerPlatform = false;
         }

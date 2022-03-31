@@ -12,7 +12,10 @@ namespace Assets.Scripts.Levels
             if(collision.gameObject.GetComponent<PlayerController>() != null)
             {
                 Debug.Log("Level Finished by the Player");
-                LevelManager.Instance.MarkCurrentLevelComplete();
+
+                FindObjectOfType<AudioManager>().Play("DoorOpening");
+
+                 LevelManager.Instance.MarkCurrentLevelComplete();
             }
         }
     }
