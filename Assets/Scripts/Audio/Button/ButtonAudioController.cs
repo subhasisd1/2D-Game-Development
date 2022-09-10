@@ -20,7 +20,7 @@ public class ButtonAudioController : MonoBehaviour
     // Update is called once per frame
     public void Play(SoundType soundType)
     {
-        Debug.Log(soundType);
+   //     Debug.Log(soundType);
         Sound s = Array.Find(sounds, sound => sound.soundType == soundType);
         s.source.Play();
     }

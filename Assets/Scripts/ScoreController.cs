@@ -10,7 +10,6 @@ public class ScoreController : MonoBehaviour
    
     private TextMeshProUGUI scroreText;
     public TextMeshProUGUI lelvelText;
-    private string sceneName;
     private int score = 0;
 
     private void Start()
@@ -20,9 +19,10 @@ public class ScoreController : MonoBehaviour
 
     private void Awake()
     {
-        sceneName = SceneManager.GetActiveScene().name;
-        lelvelText.text = sceneName.ToString();
+        lelvelText.text = "Level " + SceneManager.GetActiveScene().buildIndex;
         scroreText = GetComponent<TextMeshProUGUI>();
+
+      //  Debug.Log(scroreText);
     }
 
     public void IncreaseScore(int incrmnt)

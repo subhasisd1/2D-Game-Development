@@ -1,31 +1,44 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyBullet : MonoBehaviour
 {
     public float dieTime, damage;
     public GameObject dieEffect;
-    public EnemyController enemyController;
+    private EnemyController enemyController;
+    private PlayerController playerController;
     private float vector2X;
 
     private void Awake()
     {
         enemyController = FindObjectOfType<EnemyController>();
+        playerController = FindObjectOfType<PlayerController>();
+
         vector2X = enemyController.transform.localScale.x;
     }
     void Start()
     {
         transform.localScale = new Vector3(vector2X, 1, 1);
-    }
+        StartCoroutine(CountDownTimer());
 
-    // Update is called once per frame
+    }
 
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Die();
+        // Debug.Log("Touched "+collision.gameObject.name);
+        string cols = collision.gameObject.name;
+        if (cols == "GroundTileMap" || cols == "ExtraTileMap")
+            Die();
+
+        if (collision.gameObject.GetComponent<PlayerController>() != null)
+        {
+            playerController.animator.SetTrigger("isHurt");
+           playerController.PlayerDamage();
+           Die();
+        }
     }
+
 
     IEnumerator CountDownTimer()
     {

@@ -16,8 +16,15 @@ public class EnemyController : MonoBehaviour
     public Animator animator;
     public Transform player, shootPos;
     public HealthController health;
-
     public GameObject bullet;
+    public PlayerController playerController;
+
+
+    private void Awake()
+    {
+        playerController = FindObjectOfType<PlayerController>();
+
+    }
 
     void Start()
     {
@@ -36,7 +43,9 @@ public class EnemyController : MonoBehaviour
            Patrol();
         }
 
-        if(disToPlayer <= range)
+      //  Debug.Log("Is Dead : " + playerController.isDead);
+
+        if(disToPlayer <= range && !playerController.isDead)
         {
              animator.SetBool("run", true);
             mustPatrol = true;
@@ -98,8 +107,7 @@ public class EnemyController : MonoBehaviour
     {
         if (col.gameObject.GetComponent<PlayerController>() != null)
         {
-            PlayerController playerController = col.gameObject.GetComponent<PlayerController>();
-            health.playerHealth -= 1;
+            playerController = col.gameObject.GetComponent<PlayerController>();
             if (health.playerHealth == 0)
             {
                 playerController.KillPlayer();
@@ -107,8 +115,8 @@ public class EnemyController : MonoBehaviour
             }
             else
             {
+                health.playerHealth -= 1;
                 health.UpdateHealth(health.playerHealth);
-                playerController.HitByEnemy();
             }
         }
 
@@ -117,6 +125,20 @@ public class EnemyController : MonoBehaviour
             rb.gravityScale = 0f;
             Patrol();
         }
+
+        if (col.gameObject.name == "ExtraTileMap")
+        {
+            Flip();
+        }
+    }
+
+    public void BulletHit()
+    {
+        health.playerHealth -= 1;
+        health.UpdateHealth(health.playerHealth);
+
+        if (health.playerHealth == 0)
+            playerController.KillPlayer();
     }
 
     void OnCollisionExit2D(Collision2D collision)
@@ -134,12 +156,14 @@ public class EnemyController : MonoBehaviour
         yield return new WaitForSeconds(timeBTWShots);
         GameObject newBullet = Instantiate(bullet, shootPos.position, Quaternion.identity);
 
-        newBullet.GetComponent<Rigidbody2D>().velocity = new Vector2(transform.localScale.x * shootSpeed, transform.localScale.y);
+       newBullet.GetComponent<Rigidbody2D>().velocity = new Vector2(transform.localScale.x * shootSpeed, transform.localScale.y);
+      //  newBullet.GetComponent<Rigidbody2D>().velocity = new Vector2(shootSpeed * walkSpeed * Time.fixedDeltaTime, 0f);
 
-
-        Debug.Log(transform.localScale.x);
+       // Debug.Log("Shotting Bullet : " + transform.localScale.x);
 
         cantShoot = true;
 
     }
+
+
 }

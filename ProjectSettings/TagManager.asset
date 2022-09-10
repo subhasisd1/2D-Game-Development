@@ -5,6 +5,13 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - GroundTileMap
+  - DeathGround
+  - GroundWall
+  - FloatingRocks
+  - ExtraTileMap
+  - RLPlatform
+  - UDPlatform
   layers:
   - Default
   - TransparentFX
@@ -26,11 +33,11 @@ TagManager:
   - EnemyWeapon
   - BossWeakPoint
   - Bullet
-  - 
-  - 
-  - 
-  - 
-  - 
+  - GroundTileMap
+  - DeathGround
+  - MovingPlatform
+  - ExtraTileMap
+  - PlatformColider
   - 
   - 
   - 
@@ -50,4 +57,10 @@ TagManager:
     locked: 0
   - name: Front
     uniqueID: 3405993979
+    locked: 0
+  - name: Key
+    uniqueID: 2581530763
+    locked: 0
+  - name: Player
+    uniqueID: 3749730785
     locked: 0

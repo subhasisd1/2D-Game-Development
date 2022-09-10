@@ -6,23 +6,28 @@ using UnityEngine.Tilemaps; // needed for Tilemap
 public class MovingPlatformController : MonoBehaviour
 {
     public float walkSpeed, range;
-    private float disToPlayer;
     public bool mustPatrol;
-    public bool isPlayerInRange;
     public Tilemap tilemap;
 
     [HideInInspector]
     public bool mustTurn;
 
-    public Transform groudChkedPos;
+    public Rigidbody2D rigidbody2D;
     public Collider2D bodyColider;
     public LayerMask groundLayer;
 
+
+    private void Awake()
+    {
+        rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
+
+    }
     // Start is called before the first frame update
     void Start()
     {
         mustPatrol = true;
     }
+
 
     // Update is called once per frame
     void Update()
@@ -31,10 +36,10 @@ public class MovingPlatformController : MonoBehaviour
         {
             Patrol();
         }
-    }
 
-    private void FixedUpdate()
-    {
+      
+      //   Debug.Log(rigidbody2D.velocity);
+
     }
 
     private void Patrol()
@@ -51,18 +56,30 @@ public class MovingPlatformController : MonoBehaviour
     void Flip()
     {
         mustPatrol = false;
-        //  transform.localScale = new Vector2(transform.localScale.x * -1, transform.localScale.y);
         walkSpeed *= -1;
         mustPatrol = true;
     }
 
     private void OnCollisionEnter2D(Collision2D col)
     {
-        Debug.Log(col.gameObject.name);
-        if (col.gameObject.name == "GroundTileMap")
+      //  Debug.Log("Touched = " + col.gameObject.name);
+        string strCol = col.gameObject.name;
+
+        if (strCol == "GroundTileMap" || strCol == "PlatformColider" || strCol == "Rock")
         {
-           // Debug.Log("Touched " + col.gameObject.name + " here");
             Flip();
         }
+
+        if (strCol == "Player")
+            col.collider.transform.SetParent(transform);
+      //  Debug.Log(rigidbody2D.velocity);
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        string strCol = collision.gameObject.name;
+
+        if (strCol == "Player")
+            collision.collider.transform.SetParent(null);
     }
 }
